@@ -13,17 +13,45 @@ class Program
 {
     static void Main()
     {
-        Mage qq = new Mage("sss", 1, 2, 3, 40);
-        Knight kn = new Knight("sss", 1, 2, 300, 4);
+        string inputString;
 
-        List<BaseCharacter> allies = new List<BaseCharacter>(){qq};
-        List<BaseCharacter> bandits = new List<BaseCharacter>(){kn};
+        List<BaseCharacter> allies = new List<BaseCharacter>(){};
+        List<BaseCharacter> bandits = new List<BaseCharacter>(){};
+        
+        inputString = Console.ReadLine();
 
+        if (inputString == "hero")
+        {
+            while (inputString != "enemy")
+            {
+                inputString = Console.ReadLine();
+                var character = BaseCharacter.CreateChar(inputString);
+                allies.Add(character); 
+            }
+
+            if (inputString == "enemy")
+            {
+                while (inputString != "end")
+                {
+                    inputString = Console.ReadLine();
+                    var character = BaseCharacter.CreateChar(inputString);
+                    bandits.Add(character);
+                }
+            }
+
+            else
+            {
+                Console.WriteLine("Enter evil characters");
+            }
+        }
+        
+        else 
+        {
+            Console.WriteLine("Enter kind characters");
+        }
+        
         Team alliesTM = new Team(allies, TypeOfTeams.heroes);
         Team banditsTM = new Team(bandits, TypeOfTeams.bandits);
-
-        Team TeamToAttack = alliesTM;
-        Team TeamToDefend = banditsTM;
 
         int moveCounter = 1;
         while (alliesTM.IsSmbAlive && banditsTM.IsSmbAlive)
@@ -38,8 +66,6 @@ class Program
             }
             moveCounter += 1;
         }
-
-
     }
 
     class Team
@@ -56,9 +82,17 @@ class Program
                 isSmbAlive = value;
                 if (value == false)
                 {
-                    if (this.TypeOfTeam.Equals(TypeOfTeams.heroes))
+                    if (TypeOfTeam.Equals(TypeOfTeams.heroes))
                     {
-                        Console.WriteLine("Unfortunately our hero was brave, yet not enough skilled, or just lack of luck.");
+                        if (Members.Count > 1)
+                        {
+                            Console.WriteLine("Unfortunately our heroes were brave, yet not enough skilled, or just lack of luck.");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Unfortunately our hero was brave, yet not enough skilled, or just lack of luck.");
+                        }
+                        
                     }
                     else
                     {
@@ -71,6 +105,7 @@ class Program
         public Team( List<BaseCharacter> members, Enum typeOfTeam)
         {
             TypeOfTeam = typeOfTeam;
+            IsSmbAlive = true;
             Members = members;
             foreach (var member in Members)
             {
@@ -82,28 +117,29 @@ class Program
         {
             foreach (var member in Members)
             {
-                var sortedEnemyTeam = enemyTeam.Members.OrderBy(member => member.HealthPoints).ToList();
-                BaseCharacter aimForAttack = null;
+                if (member.IsAlive)
+                {
+                    var sortedEnemyTeam = enemyTeam.Members.OrderBy(member => member.HealthPoints).ToList();
+                    BaseCharacter aimForAttack = null;
                 
-                //find alive enemy
-                for (int i = 0; i < sortedEnemyTeam.Count; i++)
-                {
-                    if (sortedEnemyTeam[i].IsAlive)
+                    //find alive enemy
+                    for (int i = 0, amount = sortedEnemyTeam.Count; i < amount; i++)
                     {
-                        aimForAttack = sortedEnemyTeam[i];
-                        break;
+                        if (sortedEnemyTeam[i].IsAlive)
+                        {
+                            aimForAttack = sortedEnemyTeam[i];
+                            break;
+                        }
                     }
-                }
-
-                if (aimForAttack != null)
-                {
+                    
                     member.Attack(aimForAttack);
                     if (!enemyTeam.Members.Exists(member => member.IsAlive))
                     {
-                        enemyTeam.isSmbAlive = false;
+                        enemyTeam.IsSmbAlive = false;
+                        break;
                     }
+                  
                 }
-                
             }
         }
     }
@@ -118,7 +154,7 @@ class Program
         private int vitality;
         private int intelligence;
         private int agility;
-        
+
         public Team AllTeam { get; set; }
         public Weapon Weapon { get; init; }
         public MagicSkill MagicSkill { get; init; }
@@ -135,19 +171,17 @@ class Program
             get => healthPoints;
             set
             {
-                if (value > HealthPoints)
+                healthPoints = value;
+                if (healthPoints <= 0)
                 {
                     healthPoints = 0;
                     IsAlive = false;
                 }
-                else
-                {
-                    healthPoints = value ;  
-                }
             }
         }
         
-        public bool IsAlive { get; private set; }
+        public bool IsAlive { get; private set;}
+       
         
         public int ManaPoints
         {
@@ -166,10 +200,10 @@ class Program
             init => magicArmor = value;
         }
 
-        private protected BaseCharacter(string name, int strenght, int agility, int vitality, int intelligence)
+        private protected BaseCharacter(string name, int strength, int agility, int vitality, int intelligence)
         {
             Name = name;
-            Strenght = strenght;
+            Strenght = strength;
             Agility = agility;
             Vitality = vitality;
             Intelligence = intelligence;    
@@ -177,8 +211,25 @@ class Program
             ManaPoints = Intelligence * 4;
             Armor = (int)Math.Round(Agility / 2.0, MidpointRounding.AwayFromZero);
             MagicArmor = (int)Math.Round(Intelligence / 2.0, MidpointRounding.AwayFromZero);
+            IsAlive = true;
         }
-
+        
+        public static BaseCharacter CreateChar(string inputString)
+        {
+            string patternInfoCharacter = @"(\w+) (\d+) (\d+) (\d+) (\d+) (\D+)";
+            var charaterinfo = Regex.Match(inputString, patternInfoCharacter).Groups;
+            var type = charaterinfo[1].Value;
+                
+            
+            BaseCharacter character =
+                type == "knight" ? new Knight(charaterinfo[6].Value, int.Parse(charaterinfo[2].Value), int.Parse(charaterinfo[3].Value),
+                                int.Parse(charaterinfo[4].Value), int.Parse(charaterinfo[5].Value)) :
+                type == "thief" ? new Thief(charaterinfo[6].Value, int.Parse(charaterinfo[2].Value), int.Parse(charaterinfo[3].Value),
+                    int.Parse(charaterinfo[4].Value), int.Parse(charaterinfo[5].Value)) :
+                type == "mage" ? new Mage(charaterinfo[6].Value, int.Parse(charaterinfo[2].Value), int.Parse(charaterinfo[3].Value),
+                    int.Parse(charaterinfo[4].Value), int.Parse(charaterinfo[5].Value)) : null;
+            return character;
+        }
         public void Attack(BaseCharacter enemy)
         {
             int damage;
@@ -187,19 +238,19 @@ class Program
             {
                 damage = MagicSkill.UseSkill();
                 typeOfAttack = TypeOfAttack.magical;
-                Console.WriteLine(typeOfAttack);
                 ManaPoints -= MagicSkill.ManaCost;
                 
-                foreach (var memeber in enemy.AllTeam.Members)
+                foreach (var enemyMemeber in enemy.AllTeam.Members)
                 {
-                    memeber.GetDamage(damage, typeOfAttack); 
+                    Console.WriteLine($"{Name} attacking {enemyMemeber.Name} with {MagicSkill.Name}.");
+                    enemyMemeber.GetDamage(damage, typeOfAttack); 
                 }
-                  
+                return;
             }
             
             damage = Weapon.GetTotalDamage();
             typeOfAttack = TypeOfAttack.phisical;
-            Console.WriteLine(typeOfAttack);
+            Console.WriteLine($"{Name} attacking {enemy.Name} with {Weapon.Name}.");
             enemy.GetDamage(damage, typeOfAttack);
         }
 
@@ -215,7 +266,12 @@ class Program
             {
                 resultingDamage = incomingDamage - MagicArmor - Intelligence;
             }
-            healthPoints -= resultingDamage;
+            HealthPoints -= resultingDamage;
+            Console.WriteLine($"{Name} get hit for {resultingDamage} hp and have {HealthPoints} hp left!");
+            if (HealthPoints == 0)
+            {
+                Console.WriteLine($"{Name} is defeated!");
+            }
             return resultingDamage;
         }
     }
@@ -258,13 +314,15 @@ class Program
 
     class Weapon
     {
+        public string Name { get; private init; }
         public int BaseDamage { get; init; }
         public int BonusDamage { get; init; }
         public int BonusSkillDamage { get; init; }
         public BaseCharacter Owner { get; set; }
 
-        private protected Weapon(BaseCharacter owner)
+        private protected Weapon(string weaponName, BaseCharacter owner)
         {
+            Name = weaponName;
             Owner = owner;
         }
 
@@ -276,7 +334,7 @@ class Program
 
     class Sword:Weapon
     {
-        public Sword(BaseCharacter owner):base(owner)
+        public Sword(BaseCharacter owner):base("sword", owner)
         {
             BaseDamage = 5;
             BonusDamage = Owner.Strenght;
@@ -285,7 +343,7 @@ class Program
     
     class Dagger:Weapon
     {
-        public Dagger(BaseCharacter owner):base(owner)
+        public Dagger(BaseCharacter owner):base("dagger", owner)
         {
             BaseDamage = 4;
             BonusDamage = Owner.Agility;
@@ -293,7 +351,7 @@ class Program
     }
     class Staff:Weapon
     {
-        public Staff(BaseCharacter owner):base(owner)
+        public Staff(BaseCharacter owner):base("staff", owner)
         {
             BaseDamage = 15;
             BonusDamage = Owner.Agility;
@@ -303,11 +361,13 @@ class Program
 
     class MagicSkill
     {
+        public string Name { get; private init; }
         public int ManaCost { get; private set; }
         public int MagicDamage { get; private protected set; }
         public BaseCharacter Owner { get; set; }
-        private protected MagicSkill(int manaCost)
+        private protected MagicSkill(string skillName, int manaCost)
         {
+            Name = skillName;
             ManaCost = manaCost;
         }
 
@@ -319,7 +379,7 @@ class Program
 
     class ChainLightning:MagicSkill
     {
-        public ChainLightning(BaseCharacter skillUser) : base(40)
+        public ChainLightning(BaseCharacter skillUser) : base("chain lightning", 40)
         {
             MagicDamage = skillUser.Weapon.BonusSkillDamage + skillUser.Intelligence;
         }
