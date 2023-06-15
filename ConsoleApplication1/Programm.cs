@@ -15,14 +15,98 @@ class Program
     {
         Mage qq = new Mage("sss", 1, 2, 3, 40);
         Knight kn = new Knight("sss", 1, 2, 300, 4);
-        while (Console.ReadLine() != "end")
+
+        List<BaseCharacter> allies = new List<BaseCharacter>(){qq};
+        List<BaseCharacter> bandits = new List<BaseCharacter>(){kn};
+
+        Team alliesTM = new Team(allies, TypeOfTeams.heroes);
+        Team banditsTM = new Team(bandits, TypeOfTeams.bandits);
+
+        Team TeamToAttack = alliesTM;
+        Team TeamToDefend = banditsTM;
+
+        int moveCounter = 1;
+        while (alliesTM.IsSmbAlive && banditsTM.IsSmbAlive)
         {
-            Console.WriteLine(qq.Attack(kn));  
-        };
-        
+            if (moveCounter % 2 != 0)
+            {
+                alliesTM.AttackTeam(banditsTM);
+            }
+            else
+            {
+                banditsTM.AttackTeam(alliesTM); 
+            }
+            moveCounter += 1;
+        }
+
 
     }
 
+    class Team
+    {
+        public List<BaseCharacter> Members  {get; private init; }
+        private bool isSmbAlive;
+        public Enum TypeOfTeam { get; init; }
+
+        public bool IsSmbAlive
+        {
+            get => isSmbAlive;
+            set
+            {
+                isSmbAlive = value;
+                if (value == false)
+                {
+                    if (this.TypeOfTeam.Equals(TypeOfTeams.heroes))
+                    {
+                        Console.WriteLine("Unfortunately our hero was brave, yet not enough skilled, or just lack of luck.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Congratulations!");
+                    }
+                }
+            }
+        }
+        
+        public Team( List<BaseCharacter> members, Enum typeOfTeam)
+        {
+            TypeOfTeam = typeOfTeam;
+            Members = members;
+            foreach (var member in Members)
+            {
+                member.AllTeam = this;
+            }
+        }
+
+        public void AttackTeam(Team enemyTeam)
+        {
+            foreach (var member in Members)
+            {
+                var sortedEnemyTeam = enemyTeam.Members.OrderBy(member => member.HealthPoints).ToList();
+                BaseCharacter aimForAttack = null;
+                
+                //find alive enemy
+                for (int i = 0; i < sortedEnemyTeam.Count; i++)
+                {
+                    if (sortedEnemyTeam[i].IsAlive)
+                    {
+                        aimForAttack = sortedEnemyTeam[i];
+                        break;
+                    }
+                }
+
+                if (aimForAttack != null)
+                {
+                    member.Attack(aimForAttack);
+                    if (!enemyTeam.Members.Exists(member => member.IsAlive))
+                    {
+                        enemyTeam.isSmbAlive = false;
+                    }
+                }
+                
+            }
+        }
+    }
     class BaseCharacter
     {
         //TODO: дописть параметры живости и логики когда хп =< 0, то мертв значит. + Проверить что при недостатке маны будет бить рукой маг.
@@ -34,6 +118,8 @@ class Program
         private int vitality;
         private int intelligence;
         private int agility;
+        
+        public Team AllTeam { get; set; }
         public Weapon Weapon { get; init; }
         public MagicSkill MagicSkill { get; init; }
         
@@ -93,7 +179,7 @@ class Program
             MagicArmor = (int)Math.Round(Intelligence / 2.0, MidpointRounding.AwayFromZero);
         }
 
-        public int Attack(BaseCharacter enemy)
+        public void Attack(BaseCharacter enemy)
         {
             int damage;
             Enum typeOfAttack;
@@ -103,13 +189,18 @@ class Program
                 typeOfAttack = TypeOfAttack.magical;
                 Console.WriteLine(typeOfAttack);
                 ManaPoints -= MagicSkill.ManaCost;
-                return enemy.GetDamage(damage, typeOfAttack);  
+                
+                foreach (var memeber in enemy.AllTeam.Members)
+                {
+                    memeber.GetDamage(damage, typeOfAttack); 
+                }
+                  
             }
             
             damage = Weapon.GetTotalDamage();
             typeOfAttack = TypeOfAttack.phisical;
             Console.WriteLine(typeOfAttack);
-            return enemy.GetDamage(damage, typeOfAttack);
+            enemy.GetDamage(damage, typeOfAttack);
         }
 
         //TODO:can I change access modifier?
@@ -163,30 +254,6 @@ class Program
             Weapon = new Staff(this);
             MagicSkill = new ChainLightning(this);
         }
-
-        // public override int Attack(BaseCharacter enemy)
-        // {
-            // if (this.ManaPoints > this.MagicSkill.ManaCost)
-            // {
-            //     if (enemy.IsAlive)
-            //     {
-            //         int damage = this.MagicSkill.UseSkill();
-            //         Enum typeOfAttack = TypeOfAttack.magical;
-            //         Console.WriteLine(typeOfAttack);
-            //         this.ManaPoints -= this.MagicSkill.ManaCost;
-            //         return enemy.GetDamage(damage, typeOfAttack);  
-            //     }
-            //     else
-            //     {
-            //         Console.WriteLine("Enemy is already dead");
-            //     }
-            //     
-            // }
-            // else
-            // {
-            //     return base.Attack(enemy);
-            // }
-        // }
     }
 
     class Weapon
@@ -261,6 +328,12 @@ class Program
     {
         phisical,
         magical,
+    }
+    
+    enum TypeOfTeams
+    {
+        heroes,
+        bandits,
     }
 }
 
