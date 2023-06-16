@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Text;
+
 
 namespace System.Runtime.CompilerServices
 {
@@ -17,66 +17,68 @@ class Program
 
         List<BaseCharacter> allies = new List<BaseCharacter>(){};
         List<BaseCharacter> bandits = new List<BaseCharacter>(){};
-        
+
         inputString = Console.ReadLine();
-
-        if (inputString == "hero")
-        {
-            while (true)
-            {
-                inputString = Console.ReadLine();
-                if (inputString == "enemy")
-                {
-                    break;
-                }
-                var character = BaseCharacter.CreateChar(inputString);
-                allies.Add(character); 
-            }
-
-            if (inputString == "enemy")
+            if (inputString == "hero")
             {
                 while (true)
                 {
                     inputString = Console.ReadLine();
-                    if (inputString == "end")
+                    if (inputString == "enemy")
                     {
                         break;
                     }
+
                     var character = BaseCharacter.CreateChar(inputString);
-                    bandits.Add(character);
+                    allies.Add(character);
+                }
+
+                if (inputString == "enemy")
+                {
+                    while (true)
+                    {
+                        inputString = Console.ReadLine();
+                        if (inputString == "end")
+                        {
+                            Team alliesTM = new Team(allies, TypeOfTeams.heroes);
+                            Team banditsTM = new Team(bandits, TypeOfTeams.bandits);
+
+                            Intro.PrintIntro(alliesTM, banditsTM);
+
+                            //Okeeeeeey let's goooo
+                            int moveCounter = 1;
+                            while (alliesTM.IsSmbAlive && banditsTM.IsSmbAlive)
+                            {
+                                if (moveCounter % 2 != 0)
+                                {
+                                    alliesTM.AttackTeam(banditsTM);
+                                }
+                                else
+                                {
+                                    banditsTM.AttackTeam(alliesTM);
+                                }
+
+                                moveCounter += 1;
+                            }
+
+                            break;
+                        }
+
+                        var character = BaseCharacter.CreateChar(inputString);
+                        bandits.Add(character);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Enter evil characters");
                 }
             }
-            
-            else
-            {
-                Console.WriteLine("Enter evil characters");
-            }
-        }
-        
-        else 
+            else 
         {
             Console.WriteLine("Enter kind characters");
         }
-        
-        Team alliesTM = new Team(allies, TypeOfTeams.heroes);
-        Team banditsTM = new Team(bandits, TypeOfTeams.bandits);
 
-        Intro.PrintIntro(alliesTM, banditsTM);
 
-        //Okeeeeeey let's goooo
-        int moveCounter = 1;
-        while (alliesTM.IsSmbAlive && banditsTM.IsSmbAlive)
-        {
-            if (moveCounter % 2 != 0)
-            {
-                alliesTM.AttackTeam(banditsTM);
-            }
-            else
-            {
-                banditsTM.AttackTeam(alliesTM); 
-            }
-            moveCounter += 1;
-        }
     }
     
     
@@ -132,7 +134,7 @@ class Program
             {
                 if (member.IsAlive)
                 {
-                    var sortedEnemyTeam = enemyTeam.Members.OrderBy(member => member.HealthPoints).ToList();
+                    var sortedEnemyTeam = enemyTeam.Members.OrderBy(member => member.TargetPrioritet).ToList();
                     BaseCharacter aimForAttack = null;
                 
                     //find alive enemy
@@ -167,7 +169,11 @@ class Program
         private int vitality;
         private int intelligence;
         private int agility;
+
+        public int PhysicalDamage{ get; set; }
         
+        public int TargetPrioritet { get; private set; }
+
         public string Type { get; init; }
 
         public Team AllTeam { get; set; }
@@ -175,7 +181,7 @@ class Program
         public MagicSkill MagicSkill { get; init; }
         
         public string Name { get; init; }
-        public int Strenght { get; init; }
+        public int Strenght { get; set; }
         public int Agility
         {
             get => agility;
@@ -213,6 +219,7 @@ class Program
             set
             {
                 healthPoints = value;
+                ChangeTargetPrioritet();
                 if (healthPoints <= 0)
                 {
                     healthPoints = 0;
@@ -232,7 +239,11 @@ class Program
         public int Armor
         {
             get => armor;
-            set => armor = value;
+            set
+            {
+                armor = value;
+                ChangeTargetPrioritet();
+            } 
         }
         
         public int MagicArmor
@@ -243,17 +254,20 @@ class Program
 
         private protected BaseCharacter(string name, int strength, int agility, int vitality, int intelligence, string type)
         {
+            IsAlive = true;
             Name = name;
             Strenght = strength;
             Agility = agility;
             Vitality = vitality;
             Intelligence = intelligence;
-            // Armor = (int)Math.Round(Agility / 2.0, MidpointRounding.AwayFromZero);
-            // MagicArmor = (int)Math.Round(Intelligence / 2.0, MidpointRounding.AwayFromZero);
-            Type = type;
-            IsAlive = true;
+            Type = type;    
+            
         }
-        
+
+        private void ChangeTargetPrioritet()
+        {
+            TargetPrioritet = Armor + HealthPoints;
+        }
         public static BaseCharacter CreateChar(string inputString)
         {
             string patternInfoCharacter = @"(\w+) (\d+) (\d+) (\d+) (\d+) (\D+)";
