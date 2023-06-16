@@ -176,11 +176,37 @@ class Program
         
         public string Name { get; init; }
         public int Strenght { get; init; }
-        public int Agility{ get; init; }
+        public int Agility
+        {
+            get => agility;
+            set
+            {
+                agility = value;
+                Armor = (int)Math.Round(Agility / 2.0);
+            }
+        }
 
-        public int Vitality { get; init; }
-        public int Intelligence { get; init; }
+        public int Vitality 
+        {
+            get => vitality;
+            set
+            {
+                vitality = value;
+                HealthPoints = Vitality * 4;
+            }
+        }
 
+        public int Intelligence
+        {
+            get => intelligence;
+            set
+            {
+                intelligence = value;
+                MagicArmor = (int)Math.Round(Intelligence / 2.0);
+                ManaPoints = Intelligence * 4;
+            }
+        }
+        
         public int HealthPoints
         {
             get => healthPoints;
@@ -221,13 +247,9 @@ class Program
             Strenght = strength;
             Agility = agility;
             Vitality = vitality;
-            Intelligence = intelligence;    
-            HealthPoints = Vitality * 4;
-            ManaPoints = Intelligence * 4;
+            Intelligence = intelligence;
             // Armor = (int)Math.Round(Agility / 2.0, MidpointRounding.AwayFromZero);
             // MagicArmor = (int)Math.Round(Intelligence / 2.0, MidpointRounding.AwayFromZero);
-            Armor = (int)Math.Round(Agility / 2.0);
-            MagicArmor = (int)Math.Round(Intelligence / 2.0);
             Type = type;
             IsAlive = true;
         }
@@ -375,7 +397,7 @@ class Program
         public Staff(BaseCharacter owner):base("staff", owner)
         {
             BaseDamage = 15;
-            BonusDamage = Owner.Agility;
+            BonusDamage = Owner.Strenght;
             BonusSkillDamage = 10;
         }
     }
