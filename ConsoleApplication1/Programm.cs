@@ -22,23 +22,31 @@ class Program
 
         if (inputString == "hero")
         {
-            while (inputString != "enemy")
+            while (true)
             {
                 inputString = Console.ReadLine();
+                if (inputString == "enemy")
+                {
+                    break;
+                }
                 var character = BaseCharacter.CreateChar(inputString);
                 allies.Add(character); 
             }
 
             if (inputString == "enemy")
             {
-                while (inputString != "end")
+                while (true)
                 {
                     inputString = Console.ReadLine();
+                    if (inputString == "end")
+                    {
+                        break;
+                    }
                     var character = BaseCharacter.CreateChar(inputString);
                     bandits.Add(character);
                 }
             }
-
+            
             else
             {
                 Console.WriteLine("Enter evil characters");
@@ -53,6 +61,9 @@ class Program
         Team alliesTM = new Team(allies, TypeOfTeams.heroes);
         Team banditsTM = new Team(bandits, TypeOfTeams.bandits);
 
+        Intro.PrintIntro(alliesTM, banditsTM);
+
+        //Okeeeeeey let's goooo
         int moveCounter = 1;
         while (alliesTM.IsSmbAlive && banditsTM.IsSmbAlive)
         {
@@ -67,6 +78,8 @@ class Program
             moveCounter += 1;
         }
     }
+    
+    
 
     class Team
     {
@@ -154,6 +167,8 @@ class Program
         private int vitality;
         private int intelligence;
         private int agility;
+        
+        public string Type { get; init; }
 
         public Team AllTeam { get; set; }
         public Weapon Weapon { get; init; }
@@ -197,10 +212,10 @@ class Program
         public int MagicArmor
         {
             get => magicArmor;
-            init => magicArmor = value;
+            set => magicArmor = value;
         }
 
-        private protected BaseCharacter(string name, int strength, int agility, int vitality, int intelligence)
+        private protected BaseCharacter(string name, int strength, int agility, int vitality, int intelligence, string type)
         {
             Name = name;
             Strenght = strength;
@@ -209,8 +224,11 @@ class Program
             Intelligence = intelligence;    
             HealthPoints = Vitality * 4;
             ManaPoints = Intelligence * 4;
-            Armor = (int)Math.Round(Agility / 2.0, MidpointRounding.AwayFromZero);
-            MagicArmor = (int)Math.Round(Intelligence / 2.0, MidpointRounding.AwayFromZero);
+            // Armor = (int)Math.Round(Agility / 2.0, MidpointRounding.AwayFromZero);
+            // MagicArmor = (int)Math.Round(Intelligence / 2.0, MidpointRounding.AwayFromZero);
+            Armor = (int)Math.Round(Agility / 2.0);
+            MagicArmor = (int)Math.Round(Intelligence / 2.0);
+            Type = type;
             IsAlive = true;
         }
         
@@ -242,7 +260,7 @@ class Program
                 
                 foreach (var enemyMemeber in enemy.AllTeam.Members)
                 {
-                    Console.WriteLine($"{Name} attacking {enemyMemeber.Name} with {MagicSkill.Name}.");
+                    Console.WriteLine($"{Type} {Name} attacking {enemyMemeber.Type} {enemyMemeber.Name} with {MagicSkill.Name}.");
                     enemyMemeber.GetDamage(damage, typeOfAttack); 
                 }
                 return;
@@ -250,7 +268,7 @@ class Program
             
             damage = Weapon.GetTotalDamage();
             typeOfAttack = TypeOfAttack.phisical;
-            Console.WriteLine($"{Name} attacking {enemy.Name} with {Weapon.Name}.");
+            Console.WriteLine($"{Type} {Name} attacking {enemy.Type} {enemy.Name} with {Weapon.Name}.");
             enemy.GetDamage(damage, typeOfAttack);
         }
 
@@ -266,11 +284,14 @@ class Program
             {
                 resultingDamage = incomingDamage - MagicArmor - Intelligence;
             }
+
+            resultingDamage = resultingDamage < 0 ? 0 : resultingDamage;
+            
             HealthPoints -= resultingDamage;
-            Console.WriteLine($"{Name} get hit for {resultingDamage} hp and have {HealthPoints} hp left!");
+            Console.WriteLine($"{Type} {Name} get hit for {resultingDamage} hp and have {HealthPoints} hp left!");
             if (HealthPoints == 0)
             {
-                Console.WriteLine($"{Name} is defeated!");
+                Console.WriteLine($"{Type} {Name} is defeated!");
             }
             return resultingDamage;
         }
@@ -279,7 +300,7 @@ class Program
     class  Knight : BaseCharacter
     {
         public Knight(string name, int strenght, int agility, int vitality, int intelligence) :
-               base(name, strenght, agility, vitality, intelligence)
+               base(name, strenght, agility, vitality, intelligence, "Knight")
         {
             HealthPoints += 15;
             Strenght += 2;
@@ -291,7 +312,7 @@ class Program
     class  Thief : BaseCharacter
     {
         public Thief(string name, int strenght, int agility, int vitality, int intelligence) :
-            base(name, strenght, agility, vitality, intelligence)
+            base(name, strenght, agility, vitality, intelligence, "Thief")
         {
             Agility += 3;
             Weapon = new Dagger(this);
@@ -302,7 +323,7 @@ class Program
     {
         
         public Mage(string name, int strenght, int agility, int vitality, int intelligence) :
-            base(name, strenght, agility, vitality, intelligence)
+            base(name, strenght, agility, vitality, intelligence, "Mage")
         {
             Intelligence += 5;
             ManaPoints += 25;
@@ -395,6 +416,61 @@ class Program
         heroes,
         bandits,
     }
+
+    class Intro
+    {
+        static public void PrintIntro(Team alliesTM, Team enemyTM)
+        {
+            Console.WriteLine("Stay a while and listen, and I will tell you a story. A story of Dungeons and Dragons, of " +
+                              "Orcs and Goblins, of Ghouls and Ghosts, of Kings and Quests, but most importantly -- of Heroes " +
+                              "and NoobCo -- Well... A story of Heroes.");
+
+            string aboutHeroesAndEnimies;
+            string[] namesOfHeroes = new string[alliesTM.Members.Count];
+            string[] namesOfEnimies = new string[enemyTM.Members.Count];
+            
+            if (alliesTM.Members.Count == 1)
+            {
+                aboutHeroesAndEnimies = $"So here starts the journey of our hero {alliesTM.Members[0].Type} {alliesTM.Members[0].Name} got order to eliminate the local ";
+            }
+            else
+            {
+                int membersAmount = alliesTM.Members.Count;
+                for (int i = 0; i < membersAmount; i++)
+                {
+                    namesOfHeroes[i] = $"{alliesTM.Members[i].Type} {alliesTM.Members[i].Name}";
+                   
+                }
+                
+                aboutHeroesAndEnimies = $"So here starts the journey of our heroes: {String.Join(", ", namesOfHeroes)} got order to eliminate the local ";
+            }
+            
+            if (enemyTM.Members.Count == 1)
+            {
+                namesOfEnimies[0] = $"{enemyTM.Members[0].Type} {enemyTM.Members[0].Name}";
+                aboutHeroesAndEnimies += $"bandit known as {enemyTM.Members[0].Type} {enemyTM.Members[0].Name}.";
+            }
+            else
+            {
+                int membersAmount = enemyTM.Members.Count;
+                for (int i = 0; i < membersAmount; i++)
+                {
+                    namesOfEnimies[i] = $"{enemyTM.Members[i].Type} {enemyTM.Members[i].Name}";
+                }
+
+                aboutHeroesAndEnimies += $"gang consists of well known bandits: {String.Join(", ", namesOfEnimies)}.";
+
+            }
+            Console.WriteLine(aboutHeroesAndEnimies);
+
+            if (namesOfHeroes.Length > 1)
+            {
+                Console.WriteLine($"{String.Join(", ", namesOfHeroes)} engaged the {String.Join(", ", namesOfEnimies)}.");  
+            }
+            
+        }
+    }
+    
 }
 
     
