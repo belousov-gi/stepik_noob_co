@@ -47,7 +47,7 @@ class Program
 
                             //Okeeeeeey let's goooo
                             int moveCounter = 1;
-                            while (alliesTM.IsSmbAlive && banditsTM.IsSmbAlive)
+                            while (alliesTM.AmountOfAlives != 0 && banditsTM.AmountOfAlives != 0)
                             {
                                 if (moveCounter % 2 != 0)
                                 {
@@ -87,45 +87,74 @@ class Program
     {
         public List<BaseCharacter> Members  {get; private init; }
         private bool isSmbAlive;
+        private int amountOfAlives;
         public Enum TypeOfTeam { get; init; }
 
-        public bool IsSmbAlive
+        public int AmountOfAlives
         {
-            get => isSmbAlive;
+            get => amountOfAlives;
             set
             {
-                isSmbAlive = value;
-                if (value == false)
+                amountOfAlives = value;
+
+                if (TypeOfTeam.Equals(TypeOfTeams.heroes) && AmountOfAlives == 0)
                 {
-                    if (TypeOfTeam.Equals(TypeOfTeams.heroes))
+                    switch (Members.Count)
                     {
-                        if (Members.Count > 1)
-                        {
-                            Console.WriteLine("Unfortunately our heroes were brave, yet not enough skilled, or just lack of luck.");
-                        }
-                        else
-                        {
+                        case 1:
                             Console.WriteLine("Unfortunately our hero was brave, yet not enough skilled, or just lack of luck.");
-                        }
-                        
-                    }
-                    else
-                    {
-                        Console.WriteLine("Congratulations!");
+                            break;
+                        default:
+                            Console.WriteLine("Unfortunately our heroes were brave, yet not enough skilled, or just lack of luck.");
+                            break;
                     }
                 }
+                else if (TypeOfTeam.Equals(TypeOfTeams.bandits) && AmountOfAlives == 0)
+                {
+                    Console.WriteLine("Congratulations!");
+                }
+                
+                
             }
         }
+        // public bool IsSmbAlive
+        // {
+        //     get => isSmbAlive;
+        //     set
+        //     {
+        //         isSmbAlive = value;
+        //         if (value == false)
+        //         {
+        //             if (TypeOfTeam.Equals(TypeOfTeams.heroes))
+        //             {
+        //                 if (Members.Count > 1)
+        //                 {
+        //                     Console.WriteLine("Unfortunately our heroes were brave, yet not enough skilled, or just lack of luck.");
+        //                 }
+        //                 else
+        //                 {
+        //                     Console.WriteLine("Unfortunately our hero was brave, yet not enough skilled, or just lack of luck.");
+        //                 }
+        //                 
+        //             }
+        //             else
+        //             {
+        //                 Console.WriteLine("Congratulations!");
+        //             }
+        //         }
+        //     }
+        // }
         
         public Team( List<BaseCharacter> members, Enum typeOfTeam)
         {
             TypeOfTeam = typeOfTeam;
-            IsSmbAlive = true;
+            // IsSmbAlive = true;
             Members = members;
             foreach (var member in Members)
             {
                 member.AllTeam = this;
             }
+            amountOfAlives = Members.Count;
         }
 
         public void AttackTeam(Team enemyTeam)
@@ -147,25 +176,12 @@ class Program
                         }
                     }
                     
-                    
-
-                    if (aimForAttack != null)
+                    member.Attack(aimForAttack);
+                    if (enemyTeam.AmountOfAlives == 0)
                     {
-                        member.Attack(aimForAttack);
+                        break;
                     }
 
-                    else
-                    {
-                        enemyTeam.IsSmbAlive = false;
-                        break; 
-                    }
-                    
-                    // if (!enemyTeam.Members.Exists(member => member.IsAlive))
-                    // {
-                    //     enemyTeam.IsSmbAlive = false;
-                    //     break; 
-                    // }
-                  
                 }
             }
         }
@@ -235,7 +251,9 @@ class Program
                 if (healthPoints <= 0)
                 {
                     healthPoints = 0;
+                    Console.WriteLine($"{Type} {Name} is defeated!");
                     IsAlive = false;
+                    AllTeam.AmountOfAlives -= 1;
                 }
             }
         }
@@ -298,6 +316,13 @@ class Program
                     int.Parse(charaterinfo[4].Value), int.Parse(charaterinfo[5].Value)) : null;
             return character;
         }
+
+        public void PrintResultDamage(int healthPoints, int resultingDamage)
+        {
+            int remainingHealthPoints = healthPoints - resultingDamage;
+            remainingHealthPoints = remainingHealthPoints > 0 ? remainingHealthPoints : 0;
+            Console.WriteLine($"{Type} {Name} get hit for {resultingDamage} hp and have {remainingHealthPoints} hp left!"); 
+        }
         public void Attack(BaseCharacter enemy)
         {
             int damage;
@@ -341,13 +366,9 @@ class Program
             }
 
             resultingDamage = resultingDamage < 0 ? 0 : resultingDamage;
-            
+
+            PrintResultDamage(HealthPoints, resultingDamage);
             HealthPoints -= resultingDamage;
-            Console.WriteLine($"{Type} {Name} get hit for {resultingDamage} hp and have {HealthPoints} hp left!");
-            if (HealthPoints == 0)
-            {
-                Console.WriteLine($"{Type} {Name} is defeated!");
-            }
             return resultingDamage;
         }
     }
