@@ -147,12 +147,24 @@ class Program
                         }
                     }
                     
-                    member.Attack(aimForAttack);
-                    if (!enemyTeam.Members.Exists(member => member.IsAlive))
+                    
+
+                    if (aimForAttack != null)
+                    {
+                        member.Attack(aimForAttack);
+                    }
+
+                    else
                     {
                         enemyTeam.IsSmbAlive = false;
-                        break;
+                        break; 
                     }
+                    
+                    // if (!enemyTeam.Members.Exists(member => member.IsAlive))
+                    // {
+                    //     enemyTeam.IsSmbAlive = false;
+                    //     break; 
+                    // }
                   
                 }
             }
@@ -260,7 +272,9 @@ class Program
             Agility = agility;
             Vitality = vitality;
             Intelligence = intelligence;
-            Type = type;    
+            Type = type;
+            // MagicArmor = (int)Math.Round(Intelligence / 2.0);
+            // Armor = (int)Math.Round(Agility / 2.0);
             
         }
 
@@ -296,16 +310,21 @@ class Program
                 
                 foreach (var enemyMemeber in enemy.AllTeam.Members)
                 {
-                    Console.WriteLine($"{Type} {Name} attacking {enemyMemeber.Type} {enemyMemeber.Name} with {MagicSkill.Name}.");
-                    enemyMemeber.GetDamage(damage, typeOfAttack); 
+                    if (enemyMemeber.IsAlive)
+                    {
+                        Console.WriteLine($"{Type} {Name} attacking {enemyMemeber.Type} {enemyMemeber.Name} with {MagicSkill.Name}.");
+                        enemyMemeber.GetDamage(damage, typeOfAttack); 
+                    }
                 }
-                return;
             }
-            
-            damage = Weapon.GetTotalDamage();
-            typeOfAttack = TypeOfAttack.phisical;
-            Console.WriteLine($"{Type} {Name} attacking {enemy.Type} {enemy.Name} with {Weapon.Name}.");
-            enemy.GetDamage(damage, typeOfAttack);
+            else
+            {
+                damage = Weapon.GetTotalDamage();
+                typeOfAttack = TypeOfAttack.phisical;
+                Console.WriteLine($"{Type} {Name} attacking {enemy.Type} {enemy.Name} with {Weapon.Name}.");
+                enemy.GetDamage(damage, typeOfAttack);  
+            }
+
         }
 
         //TODO:can I change access modifier?
