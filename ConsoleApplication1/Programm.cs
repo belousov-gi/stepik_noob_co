@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text.RegularExpressions;
 
 
@@ -14,78 +15,89 @@ class Program
     static void Main()
     {
         string inputString;
+        string inputKey;
 
         List<BaseCharacter> allies = new List<BaseCharacter>(){};
         List<BaseCharacter> bandits = new List<BaseCharacter>(){};
+        Team alliesTM;
+        Team banditsTM;
 
-        inputString = Console.ReadLine();
-            if (inputString == "hero")
+        inputKey = Console.ReadLine();
+        BaseCharacter character;
+        while (true)
+        {
+            switch (inputKey)
             {
-                while (true)
+                case "hero":
                 {
-                    inputString = Console.ReadLine();
-                    if (inputString == "enemy")
-                    {
-                        break;
-                    }
-
-                    var character = BaseCharacter.CreateChar(inputString);
-                    allies.Add(character);
-                }
-
-                if (inputString == "enemy")
-                {
-                    while (true)
+                    while (inputKey == "hero")
                     {
                         inputString = Console.ReadLine();
-                        if (inputString == "end")
+                        if (inputString == "enemy" || inputString == "end")
                         {
-                            if (allies.Count == 0 || bandits.Count == 0)
-                            {
-                                throw new Exception("Invalid numbers of characters");
-                            }
-                            
-                            Team alliesTM = new Team(allies, TypeOfTeams.heroes);
-                            Team banditsTM = new Team(bandits, TypeOfTeams.bandits);
-
-                            Intro.PrintIntro(alliesTM, banditsTM);
-
-                            //Okeeeeeey let's goooo
-                            int moveCounter = 1;
-                            while (alliesTM.AmountOfAlives != 0 && banditsTM.AmountOfAlives != 0)
-                            {
-                                if (moveCounter % 2 != 0)
-                                {
-                                    alliesTM.AttackTeam(banditsTM);
-                                    // Console.WriteLine("---------------");
-                                }
-                                else
-                                {
-                                    banditsTM.AttackTeam(alliesTM);
-                                    // Console.WriteLine("---------------");
-                                }
-
-                                moveCounter += 1;
-                            }
-
-                            break;
+                            inputKey = inputString;
+                            goto changedKey;
                         }
 
-                        var character = BaseCharacter.CreateChar(inputString);
+                        character = BaseCharacter.CreateChar(inputString);
+                        allies.Add(character);  
+                    }
+                    break;
+                }
+                
+                
+                case "enemy":
+                    while (inputKey == "enemy")
+                    {
+                        inputString = Console.ReadLine();
+                        if (inputString == "hero" || inputString == "end")
+                        {
+                            inputKey = inputString;
+                            goto changedKey;
+                        }
+                    
+                        character = BaseCharacter.CreateChar(inputString);
                         bandits.Add(character);
                     }
-                }
-                else
-                {
-                    Console.WriteLine("Enter evil characters");
-                }
+                    break;
+
+
+                case "end":
+                    if (allies.Count == 0 || bandits.Count == 0)
+                    {
+                        throw new Exception("Invalid numbers of characters");
+                    }
+                    alliesTM = new Team(allies, TypeOfTeams.heroes);
+                    banditsTM = new Team(bandits, TypeOfTeams.bandits);
+                    goto Battle;
+                    
+                
+                default:
+                    throw new Exception("Invalid team key");
             }
-            else 
-        {
-            Console.WriteLine("Enter kind characters");
+            changedKey: ;
         }
-
-
+        
+        Battle:
+        Intro.PrintIntro(alliesTM, banditsTM);
+        
+        //Okeeeeeey let's goooo
+        int moveCounter = 1;
+        while (alliesTM.AmountOfAlives != 0 && banditsTM.AmountOfAlives != 0)
+        {
+            if (moveCounter % 2 != 0)
+            {
+                alliesTM.AttackTeam(banditsTM);
+                // Console.WriteLine("---------------");
+            }
+            else
+            {
+                banditsTM.AttackTeam(alliesTM);
+                // Console.WriteLine("---------------");
+            }
+        
+            moveCounter += 1;
+        }
     }
     
     
