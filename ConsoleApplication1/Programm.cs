@@ -40,6 +40,11 @@ class Program
                         inputString = Console.ReadLine();
                         if (inputString == "end")
                         {
+                            if (allies.Count == 0 || bandits.Count == 0)
+                            {
+                                throw new Exception("Invalid numbers of characters");
+                            }
+                            
                             Team alliesTM = new Team(allies, TypeOfTeams.heroes);
                             Team banditsTM = new Team(bandits, TypeOfTeams.bandits);
 
@@ -52,10 +57,12 @@ class Program
                                 if (moveCounter % 2 != 0)
                                 {
                                     alliesTM.AttackTeam(banditsTM);
+                                    // Console.WriteLine("---------------");
                                 }
                                 else
                                 {
                                     banditsTM.AttackTeam(alliesTM);
+                                    // Console.WriteLine("---------------");
                                 }
 
                                 moveCounter += 1;
@@ -117,33 +124,7 @@ class Program
                 
             }
         }
-        // public bool IsSmbAlive
-        // {
-        //     get => isSmbAlive;
-        //     set
-        //     {
-        //         isSmbAlive = value;
-        //         if (value == false)
-        //         {
-        //             if (TypeOfTeam.Equals(TypeOfTeams.heroes))
-        //             {
-        //                 if (Members.Count > 1)
-        //                 {
-        //                     Console.WriteLine("Unfortunately our heroes were brave, yet not enough skilled, or just lack of luck.");
-        //                 }
-        //                 else
-        //                 {
-        //                     Console.WriteLine("Unfortunately our hero was brave, yet not enough skilled, or just lack of luck.");
-        //                 }
-        //                 
-        //             }
-        //             else
-        //             {
-        //                 Console.WriteLine("Congratulations!");
-        //             }
-        //         }
-        //     }
-        // }
+     
         
         public Team( List<BaseCharacter> members, Enum typeOfTeam)
         {
@@ -198,8 +179,6 @@ class Program
         private int intelligence;
         private int agility;
 
-        public int PhysicalDamage{ get; set; }
-        
         public int TargetPrioritet { get; private set; }
 
         public string Type { get; init; }
@@ -302,18 +281,54 @@ class Program
         }
         public static BaseCharacter CreateChar(string inputString)
         {
-            string patternInfoCharacter = @"(\w+) (\d+) (\d+) (\d+) (\d+) (\D+)";
+            string patternInfoCharacter = @"(\w+) ([-]*\d+)\s+([-]*\d+)\s+([-]*\d+)\s+([-]*\d+)\s+([a-zA-Z 0-9]+)";
             var charaterinfo = Regex.Match(inputString, patternInfoCharacter).Groups;
-            var type = charaterinfo[1].Value;
+            if (charaterinfo.Count < 6)
+            {
+                throw new Exception("Invalid amount of input paramets");
+            }
+            string charType = charaterinfo[1].Value;
+            int strenght = int.Parse(charaterinfo[2].Value);
+            int agility = int.Parse(charaterinfo[3].Value);
+            int vitality = int.Parse(charaterinfo[4].Value);
+            int intelligence = int.Parse(charaterinfo[5].Value);
+            string charName = charaterinfo[6].Value;
+
+            int[] characterCharacteristics = new[] {strenght, agility, vitality, intelligence };
+
+            foreach (var characteristic in characterCharacteristics)
+            {
+                if (characteristic < 0)
+                {
+                    throw new ArgumentException("Value must be greater than zero");
+                }
+            }
+
+            BaseCharacter character;
+            switch (charType)
+            {
+                case "knight":
+                {
+                    character = new Knight(charName, strenght, agility, vitality, intelligence);
+                    break; 
+                }
+
+                case "thief":
+                {
+                    character = new Thief(charName, strenght, agility, vitality, intelligence);
+                    break; 
+                }
+
+                case "mage":
+                {
+                    character = new Mage(charName, strenght, agility, vitality, intelligence);
+                    break;
+                }
                 
+                default:
+                    throw new ArgumentException("Invalid class of character"); 
+            }
             
-            BaseCharacter character =
-                type == "knight" ? new Knight(charaterinfo[6].Value, int.Parse(charaterinfo[2].Value), int.Parse(charaterinfo[3].Value),
-                                int.Parse(charaterinfo[4].Value), int.Parse(charaterinfo[5].Value)) :
-                type == "thief" ? new Thief(charaterinfo[6].Value, int.Parse(charaterinfo[2].Value), int.Parse(charaterinfo[3].Value),
-                    int.Parse(charaterinfo[4].Value), int.Parse(charaterinfo[5].Value)) :
-                type == "mage" ? new Mage(charaterinfo[6].Value, int.Parse(charaterinfo[2].Value), int.Parse(charaterinfo[3].Value),
-                    int.Parse(charaterinfo[4].Value), int.Parse(charaterinfo[5].Value)) : null;
             return character;
         }
 
