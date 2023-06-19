@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Text.RegularExpressions;
-
-
 namespace System.Runtime.CompilerServices
 {
     internal static class IsExternalInit {}
@@ -37,11 +34,19 @@ class Program
                         if (inputString == "enemy" || inputString == "end")
                         {
                             inputKey = inputString;
-                            goto changedKey;
+                            goto enterInfo;
                         }
 
-                        character = BaseCharacter.CreateChar(inputString);
-                        allies.Add(character);  
+                        try
+                        {
+                            character = BaseCharacter.CreateChar(inputString);
+                            allies.Add(character);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Exception: {ex.Message}");
+                            goto enterInfo;
+                        }
                     }
                     break;
                 }
@@ -54,11 +59,20 @@ class Program
                         if (inputString == "hero" || inputString == "end")
                         {
                             inputKey = inputString;
-                            goto changedKey;
+                            goto enterInfo;
                         }
-                    
-                        character = BaseCharacter.CreateChar(inputString);
-                        bandits.Add(character);
+
+                        try
+                        {
+                            character = BaseCharacter.CreateChar(inputString);
+                            bandits.Add(character);
+                        }
+
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Exception: {ex.Message}");
+                            goto enterInfo;
+                        }
                     }
                     break;
 
@@ -74,9 +88,12 @@ class Program
                     
                 
                 default:
-                    throw new Exception("Invalid team key");
+                    Console.WriteLine("Invalid teams key");
+                    inputKey = Console.ReadLine();
+                    goto enterInfo;
+                    
             }
-            changedKey: ;
+            enterInfo: ;
         }
         
         Battle:
@@ -88,14 +105,11 @@ class Program
             if (moveCounter % 2 != 0)
             {
                 alliesTM.AttackTeam(banditsTM);
-                // Console.WriteLine("---------------");
             }
             else
             {
                 banditsTM.AttackTeam(alliesTM);
-                // Console.WriteLine("---------------");
             }
-        
             moveCounter += 1;
         }
     }
@@ -139,7 +153,6 @@ class Program
         public Team( List<BaseCharacter> members, Enum typeOfTeam)
         {
             TypeOfTeam = typeOfTeam;
-            // IsSmbAlive = true;
             Members = members;
             foreach (var member in Members)
             {
@@ -167,12 +180,14 @@ class Program
                         }
                     }
                     
+                    //attack alive enemy
                     member.Attack(aimForAttack);
+                    
+                    //for case with lightning damage
                     if (enemyTeam.AmountOfAlives == 0)
                     {
                         break;
                     }
-
                 }
             }
         }
@@ -180,9 +195,7 @@ class Program
     class BaseCharacter
     {
         private int healthPoints;
-        private int manaPoints;
         private int armor;
-        private int magicArmor;
         private int vitality;
         private int intelligence;
         private int agility;
@@ -247,12 +260,7 @@ class Program
         
         public bool IsAlive { get; private set;}
        
-        
-        public int ManaPoints
-        {
-            get => manaPoints;
-            set => manaPoints = value;
-        }
+        public int ManaPoints { get; set; }
         public int Armor
         {
             get => armor;
@@ -263,11 +271,7 @@ class Program
             } 
         }
         
-        public int MagicArmor
-        {
-            get => magicArmor;
-            set => magicArmor = value;
-        }
+        public int MagicArmor { get; set; }
 
         private protected BaseCharacter(string name, int strength, int agility, int vitality, int intelligence, string type)
         {
@@ -278,9 +282,6 @@ class Program
             Vitality = vitality;
             Intelligence = intelligence;
             Type = type;
-            // MagicArmor = (int)Math.Round(Intelligence / 2.0);
-            // Armor = (int)Math.Round(Agility / 2.0);
-            
         }
 
         private void ChangeTargetPrioritet()
@@ -313,7 +314,7 @@ class Program
             {
                 if (characteristic < 0)
                 {
-                    throw new ArgumentException("Value must be positive");
+                    throw new ArgumentException("Strenght, agility, intelligence must be positive");
                 }
             }
 
@@ -379,8 +380,6 @@ class Program
             }
 
         }
-
-        //can I change access modifier?
         public int GetDamage(int incomingDamage, Enum typeOfDamage)
         {
             int resultingDamage;
@@ -416,7 +415,7 @@ class Program
     class  Thief : BaseCharacter
     {
         public Thief(string name, int strenght, int agility, int vitality, int intelligence) :
-            base(name, strenght, agility, vitality, intelligence, "Thief")
+               base(name, strenght, agility, vitality, intelligence, "Thief")
         {
             Agility += 3;
             Weapon = new Dagger(this);
@@ -425,9 +424,8 @@ class Program
     
     class  Mage : BaseCharacter
     {
-        
         public Mage(string name, int strenght, int agility, int vitality, int intelligence) :
-            base(name, strenght, agility, vitality, intelligence, "Mage")
+               base(name, strenght, agility, vitality, intelligence, "Mage")
         {
             Intelligence += 5;
             ManaPoints += 25;
@@ -543,9 +541,8 @@ class Program
                 for (int i = 0; i < membersAmount; i++)
                 {
                     namesOfHeroes[i] = $"{alliesTM.Members[i].Type} {alliesTM.Members[i].Name}";
-                   
                 }
-                
+
                 aboutHeroesAndEnimies = $"So here starts the journey of our heroes: {String.Join(", ", namesOfHeroes)} got order to eliminate the local ";
             }
             
@@ -563,7 +560,6 @@ class Program
                 }
 
                 aboutHeroesAndEnimies += $"gang consists of well known bandits: {String.Join(", ", namesOfEnimies)}.";
-
             }
             Console.WriteLine(aboutHeroesAndEnimies);
 
@@ -571,15 +567,6 @@ class Program
             {
                 Console.WriteLine($"{String.Join(", ", namesOfHeroes)} engaged the {String.Join(", ", namesOfEnimies)}.");  
             }
-            
         }
     }
-    
 }
-
-    
-
- 
-    
-
-
