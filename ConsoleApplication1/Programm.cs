@@ -24,6 +24,7 @@ class Program
 
         inputKey = Console.ReadLine();
         BaseCharacter character;
+        
         while (true)
         {
             switch (inputKey)
@@ -81,7 +82,6 @@ class Program
         Battle:
         Intro.PrintIntro(alliesTM, banditsTM);
         
-        //Okeeeeeey let's goooo
         int moveCounter = 1;
         while (alliesTM.AmountOfAlives != 0 && banditsTM.AmountOfAlives != 0)
         {
@@ -132,8 +132,6 @@ class Program
                 {
                     Console.WriteLine("Congratulations!");
                 }
-                
-                
             }
         }
      
@@ -181,8 +179,6 @@ class Program
     }
     class BaseCharacter
     {
-        //TODO: дописть параметры живости и логики когда хп =< 0, то мертв значит. + Проверить что при недостатке маны будет бить рукой маг.
-        
         private int healthPoints;
         private int manaPoints;
         private int armor;
@@ -207,7 +203,7 @@ class Program
             set
             {
                 agility = value;
-                Armor = (int)Math.Round(Agility / 2.0);
+                Armor = (int)Math.Floor(Agility / (decimal)2);
             }
         }
 
@@ -227,7 +223,7 @@ class Program
             set
             {
                 intelligence = value;
-                MagicArmor = (int)Math.Round(Intelligence / 2.0);
+                MagicArmor = (int)Math.Floor(Intelligence / (decimal)2);
                 ManaPoints = Intelligence * 4;
             }
         }
@@ -293,11 +289,11 @@ class Program
         }
         public static BaseCharacter CreateChar(string inputString)
         {
-            string patternInfoCharacter = @"(\w+) ([-]*\d+)\s+([-]*\d+)\s+([-]*\d+)\s+([-]*\d+)\s+([a-zA-Z 0-9]+)";
+            string patternInfoCharacter = @"(\w+)\s+([-]*\d+)\s+([-]*\d+)\s+([-]*\d+)\s+([-]*\d+)\s+([a-zA-Z]+[a-zA-Z 0-9]*)";
             var charaterinfo = Regex.Match(inputString, patternInfoCharacter).Groups;
             if (charaterinfo.Count < 6)
             {
-                throw new Exception("Invalid amount of input paramets");
+                throw new Exception("Invalid amount of input paramets or some parameter(s) incorrect");
             }
             string charType = charaterinfo[1].Value;
             int strenght = int.Parse(charaterinfo[2].Value);
@@ -306,13 +302,18 @@ class Program
             int intelligence = int.Parse(charaterinfo[5].Value);
             string charName = charaterinfo[6].Value;
 
-            int[] characterCharacteristics = new[] {strenght, agility, vitality, intelligence };
+            int[] characterCharacteristics = new[] {strenght, agility, intelligence };
+
+            if (vitality <= 0)
+            {
+                throw new ArgumentException("Vitality must be greater than zero"); 
+            }
 
             foreach (var characteristic in characterCharacteristics)
             {
                 if (characteristic < 0)
                 {
-                    throw new ArgumentException("Value must be greater than zero");
+                    throw new ArgumentException("Value must be positive");
                 }
             }
 
@@ -379,7 +380,7 @@ class Program
 
         }
 
-        //TODO:can I change access modifier?
+        //can I change access modifier?
         public int GetDamage(int incomingDamage, Enum typeOfDamage)
         {
             int resultingDamage;
