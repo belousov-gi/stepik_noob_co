@@ -155,6 +155,7 @@ knight 8 2 8 1 Sir van der Her
 enemy
 mage 1 5 5 9001 Master Vasya the keeper of broken calculator
 end
+
 Sample Output 1:
 
 Stay a while and listen, and I will tell you a story. A story of Dungeons and Dragons, of Orcs and Goblins, of Ghouls and Ghosts, of Kings and Quests, but most importantly -- of Heroes and NoobCo -- Well... A story of Heroes.
@@ -176,6 +177,7 @@ knight 5 2 8 1 Sir van der Her
 enemy
 mage 1 5 5 15 Master Joda
 end
+
 Sample Output 2:
 
 Stay a while and listen, and I will tell you a story. A story of Dungeons and Dragons, of Orcs and Goblins, of Ghouls and Ghosts, of Kings and Quests, but most importantly -- of Heroes and NoobCo -- Well... A story of Heroes.
@@ -216,6 +218,7 @@ mage 1 5 5 15 Master Joda
 mage 1 5 5 15 Master Zelyonka
 thief 2 8 2 3 Silent Assassin
 end
+
 Sample Output 3:
 
 Stay a while and listen, and I will tell you a story. A story of Dungeons and Dragons, of Orcs and Goblins, of Ghouls and Ghosts, of Kings and Quests, but most importantly -- of Heroes and NoobCo -- Well... A story of Heroes.
