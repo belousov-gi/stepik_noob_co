@@ -1,0 +1,245 @@
+---------------------------------------
+"Stay a while and listen, and I will tell you a story. A story of Dungeons and Dragons, of Orcs and Goblins, of Ghouls and Ghosts, of Kings and Quests, but most importantly -- of Heroes and NoobCo -- Well... A story of Heroes."
+-- неизвестный автор
+Именно так будет начинаться наша маленькая сказка.
+---------------------------------------
+Действующие лица:
+1. Рыцарь (Knight) - благородный воитель в сверкающих доспехах, приверженный кодексу чести.
+Запас здоровья +15
+Сила +2
+Броня +2
+Экипирован мечом
+
+2. Вор (Thief) - мало кто во всей обширной империи знает столько уловок и ухищрений.
+Ловкость +3
+Экипирован кинжалом
+
+3. Волшебник (Mage) - лицо, профессионально занимающееся магией. Нам, к сожалению, достался junior волшебник, который знает только одно заклинание.
+Интеллект +5
+Запас магической энергии +25
+Магическая броня +2
+Может использовать заклинание "Цепная молния (Chain lightning)". Стоимость использования заклинания 40 очков магической энергии. Заклинание наносит магический урон всем противникам в порядке ввода. Бонус к урону от интеллекта персонажа
+Экипирован посохом
+Если магической энергии не хватает на использование заклинания - бьёт посохом 
+---------------------------------------
+Характеристики персонажа:
+Имя
+Сила
+Ловкость
+Живучесть
+Интеллект
+Очки здоровья = живучесть * 4
+Очки магической энергии = интеллект * 4
+Броня = ловкость / 2
+Магическая броня = интеллект / 2
+---------------------------------------
+Оружие:
+1. Меч (Sword)
+Урон 5
+Наносит физический урон
+Бонус к урону от силы
+
+2. Кинжал (Dagger)
+Урон 4
+Наносит физический урон
+Бонус к урону от ловкости
+
+3. Посох (Staff)
+Урон 15
+Тип урона физический
+Бонус к урону от силы
+Увеличивает урон от заклинаний на 10
+---------------------------------------
+Что здесь собственно происходит?
+
+Попробуем ответить на этот вопрос. Для примера разберём первый тест (Вы просили - мы услышали! В этом задании открыты 3 теста по цене одного!)
+
+1) Вступление:
+
+Stay a while and listen, and I will tell you a story. A story of Dungeons and Dragons, of Orcs and Goblins, of Ghouls and Ghosts, of Kings and Quests, but most importantly -- of Heroes and NoobCo -- Well... A story of Heroes.
+
+Ничего особенного, ваш вывод всегда должен начинаться с него.
+
+2) Завязка:
+
+So here starts the journey of our hero Knight Sir van der Her got order to eliminate the local bandit known as Mage Master Vasya the keeper of broken calculator.
+
+Обратите внимание, как меняется вывод в зависимости от количества персонажей.
+
+3) Кульминация:
+
+Knight Sir van der Her attacking Mage Master Vasya the keeper of broken calculator with sword.
+Mage Master Vasya the keeper of broken calculator get hit for 8 hp and have 12 hp left!
+Mage Master Vasya the keeper of broken calculator attacking Knight Sir van der Her with chain lightning.
+Knight Sir van der Her get hit for 9015 hp and have 0 hp left!
+Knight Sir van der Her is defeated!
+
+1. Кто, кого и чем ударил
+2. Какой урон получила цель и сколько здоровья у неё осталось
+3. GOTO 1
+4. Оповещение о поверженном персонаже
+
+4) Финал:
+
+Если нашему герою(героям) удалось выполнить заказ:
+
+Congratulations!
+
+В случае неудачи:
+
+Unfortunately our hero was brave, yet not enough skilled, or just lack of luck.
+
+Обратите внимание, как меняется вывод в зависимости от количества персонажей.
+
+---------------------------------------
+
+Расчёт урона.
+
+Физический урон:
+
+УРОН = УРОН ОРУЖИЯ + БОНУС ОТ ХАРАКТЕРИСТИКИ ПЕРСОНАЖА
+Бонус от характеристики даёт +1 к урону за каждую единицу.
+
+Урон от заклинания:
+
+УРОН = УВЕЛИЧЕНИЕ УРОНА ОТ ЗАКЛИНАНИЙ + ИНТЕЛЛЕКТ
+Бонус от характеристики даёт +1 к урону за каждую единицу.
+---------------------------------------
+
+Расчёт полученного урона.
+
+Физический урон, который получит персонаж:
+УРОН = ВХОДЯЩИЙ УРОН - БРОНЯ - ЛОВКОСТЬ
+
+Урон от заклинания, который получит персонаж:
+УРОН = ВХОДЯЩИЙ УРОН - МАГИЧЕСКАЯ БРОНЯ - ИНТЕЛЛЕКТ
+
+Внимание! При получении урона очки здоровья уменьшатся на это значение.
+---------------------------------------
+
+Порядок сражения:
+Герои атакуют первыми
+Если в отряде несколько человек они атакуют подряд в порядке ввода
+Затем ход противника по тем же правилам
+Маги атакуют заклинаниями пока не закончится магическая энергия
+Персонаж выбирает для атаки противника с меньшим значением ОЧКИ ЗДОРОВЬЯ + БРОНЯ, даже маг (junior, что с него взять)
+
+---------------------------------------
+
+Входные данные:
+1) Ключ "hero". После него на вход подаются "хорошие" персонажи каждый с новой строки.
+
+2) Персонаж описывается одной строкой "knight 8 2 8 1 Sir van der Her", где
+
+knight - класс персонажа
+8 - сила
+2 - ловкость
+8 - живучесть
+1 - интеллект
+"Sir van der Her" - имя
+Персонажей может быть несколько.
+
+3) Ключ "enemy". После него на вход подаются "плохие" персонажи каждый с новой строки
+
+4) Ключ "end" обозначает конец ввода
+
+Внимание! Этот пункт поможет сохранить нервы и душевное спокойствие.
+Чтобы избежать лишних ошибок при расчётах все характеристики персонажей объявляем целочисленными (int)
+
+---------------------------------------
+
+Sample Input 1:
+
+hero
+knight 8 2 8 1 Sir van der Her
+enemy
+mage 1 5 5 9001 Master Vasya the keeper of broken calculator
+end
+Sample Output 1:
+
+Stay a while and listen, and I will tell you a story. A story of Dungeons and Dragons, of Orcs and Goblins, of Ghouls and Ghosts, of Kings and Quests, but most importantly -- of Heroes and NoobCo -- Well... A story of Heroes.
+So here starts the journey of our hero Knight Sir van der Her got order to eliminate the local bandit known as Mage Master Vasya the keeper of broken calculator.
+Knight Sir van der Her attacking Mage Master Vasya the keeper of broken calculator with sword.
+Mage Master Vasya the keeper of broken calculator get hit for 8 hp and have 12 hp left!
+Mage Master Vasya the keeper of broken calculator attacking Knight Sir van der Her with chain lightning.
+Knight Sir van der Her get hit for 9015 hp and have 0 hp left!
+Knight Sir van der Her is defeated!
+Unfortunately our hero was brave, yet not enough skilled, or just lack of luck.
+
+---------------------------------------
+
+Sample Input 2:
+
+hero
+mage 1 5 5 8 Master Zelyonka
+knight 5 2 8 1 Sir van der Her
+enemy
+mage 1 5 5 15 Master Joda
+end
+Sample Output 2:
+
+Stay a while and listen, and I will tell you a story. A story of Dungeons and Dragons, of Orcs and Goblins, of Ghouls and Ghosts, of Kings and Quests, but most importantly -- of Heroes and NoobCo -- Well... A story of Heroes.
+So here starts the journey of our heroes: Mage Master Zelyonka, Knight Sir van der Her got order to eliminate the local bandit known as Mage Master Joda.
+Mage Master Zelyonka, Knight Sir van der Her engaged the Mage Master Joda.
+Mage Master Zelyonka attacking Mage Master Joda with chain lightning.
+Mage Master Joda get hit for 0 hp and have 20 hp left!
+Knight Sir van der Her attacking Mage Master Joda with sword.
+Mage Master Joda get hit for 5 hp and have 15 hp left!
+Mage Master Joda attacking Mage Master Zelyonka with chain lightning.
+Mage Master Zelyonka get hit for 9 hp and have 11 hp left!
+Mage Master Joda attacking Knight Sir van der Her with chain lightning.
+Knight Sir van der Her get hit for 29 hp and have 18 hp left!
+Mage Master Zelyonka attacking Mage Master Joda with staff.
+Mage Master Joda get hit for 9 hp and have 6 hp left!
+Knight Sir van der Her attacking Mage Master Joda with sword.
+Mage Master Joda get hit for 5 hp and have 1 hp left!
+Mage Master Joda attacking Mage Master Zelyonka with chain lightning.
+Mage Master Zelyonka get hit for 9 hp and have 2 hp left!
+Mage Master Joda attacking Knight Sir van der Her with chain lightning.
+Knight Sir van der Her get hit for 29 hp and have 0 hp left!
+Knight Sir van der Her is defeated!
+Mage Master Zelyonka attacking Mage Master Joda with staff.
+Mage Master Joda get hit for 9 hp and have 0 hp left!
+Mage Master Joda is defeated!
+Congratulations!
+
+---------------------------------------
+
+Sample Input 3:
+
+hero
+knight 5 2 8 1 Sir van der Vard
+knight 5 2 7 1 Sir van der Her
+knight 5 2 10 1 Sir van der Boozer
+enemy
+mage 1 5 5 15 Master Joda
+mage 1 5 5 15 Master Zelyonka
+thief 2 8 2 3 Silent Assassin
+end
+Sample Output 3:
+
+Stay a while and listen, and I will tell you a story. A story of Dungeons and Dragons, of Orcs and Goblins, of Ghouls and Ghosts, of Kings and Quests, but most importantly -- of Heroes and NoobCo -- Well... A story of Heroes.
+So here starts the journey of our heroes: Knight Sir van der Vard, Knight Sir van der Her, Knight Sir van der Boozer got order to eliminate the local gang consists of well known bandits: Mage Master Joda, Mage Master Zelyonka, Thief Silent Assassin.
+Knight Sir van der Vard, Knight Sir van der Her, Knight Sir van der Boozer engaged the Mage Master Joda, Mage Master Zelyonka, Thief Silent Assassin.
+Knight Sir van der Vard attacking Thief Silent Assassin with sword.
+Thief Silent Assassin get hit for 0 hp and have 8 hp left!
+Knight Sir van der Her attacking Thief Silent Assassin with sword.
+Thief Silent Assassin get hit for 0 hp and have 8 hp left!
+Knight Sir van der Boozer attacking Thief Silent Assassin with sword.
+Thief Silent Assassin get hit for 0 hp and have 8 hp left!
+Mage Master Joda attacking Knight Sir van der Vard with chain lightning.
+Knight Sir van der Vard get hit for 29 hp and have 18 hp left!
+Mage Master Joda attacking Knight Sir van der Her with chain lightning.
+Knight Sir van der Her get hit for 29 hp and have 14 hp left!
+Mage Master Joda attacking Knight Sir van der Boozer with chain lightning.
+Knight Sir van der Boozer get hit for 29 hp and have 26 hp left!
+Mage Master Zelyonka attacking Knight Sir van der Vard with chain lightning.
+Knight Sir van der Vard get hit for 29 hp and have 0 hp left!
+Knight Sir van der Vard is defeated!
+Mage Master Zelyonka attacking Knight Sir van der Her with chain lightning.
+Knight Sir van der Her get hit for 29 hp and have 0 hp left!
+Knight Sir van der Her is defeated!
+Mage Master Zelyonka attacking Knight Sir van der Boozer with chain lightning.
+Knight Sir van der Boozer get hit for 29 hp and have 0 hp left!
+Knight Sir van der Boozer is defeated!
+Unfortunately our heroes were brave, yet not enough skilled, or just lack of luck.
