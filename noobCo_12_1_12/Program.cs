@@ -74,7 +74,7 @@ class Program
                 CurrentSheetsOutcome = DefaultSheetsOutcome;
             }
         }
-        public Enum Type { get;  init; }
+        public Enum Type { get;}
 
         private protected int DefaultSalary
         {
