@@ -14,14 +14,13 @@ class Program
         string inputString;
         string inputKey;
 
-        List<BaseCharacter> allies = new List<BaseCharacter>(){};
-        List<BaseCharacter> bandits = new List<BaseCharacter>(){};
+        List<BaseCharacter> allies = new List<BaseCharacter>();
+        List<BaseCharacter> bandits = new List<BaseCharacter>();
         Team alliesTM;
         Team banditsTM;
+        BaseCharacter character;
 
         inputKey = Console.ReadLine();
-        BaseCharacter character;
-        
         while (true)
         {
             switch (inputKey)
@@ -50,7 +49,6 @@ class Program
                     }
                     break;
                 }
-                
                 
                 case "enemy":
                     while (inputKey == "enemy")
@@ -110,7 +108,6 @@ class Program
             {
                 banditsTM.AttackTeam(alliesTM);
             }
-
             moveCounter++;
         }
     }
@@ -119,10 +116,10 @@ class Program
 
     class Team
     {
-        public List<BaseCharacter> Members  {get; private init; }
+        public List<BaseCharacter> Members  {get;}
         private bool isSmbAlive;
         private int amountOfAlives;
-        public Enum TypeOfTeam { get; init; }
+        public Enum TypeOfTeam { get;}
 
         public int AmountOfAlives
         {
@@ -200,13 +197,13 @@ class Program
 
         public int TargetPrioritet { get; private set; }
 
-        public string Type { get; init; }
+        public string Type { get;}
 
         public Team AllTeam { get; set; }
         public Weapon Weapon { get; init; }
         public MagicSkill MagicSkill { get; init; }
         
-        public string Name { get; init; }
+        public string Name { get; }
         public int Strenght { get; set; }
         public int Agility
         {
@@ -251,7 +248,7 @@ class Program
                     healthPoints = 0;
                     Console.WriteLine($"{Type} {Name} is defeated!");
                     IsAlive = false;
-                    AllTeam.AmountOfAlives -= 1;
+                    AllTeam.AmountOfAlives--;
                 }
             }
         }
@@ -377,7 +374,7 @@ class Program
             }
 
         }
-        public int GetDamage(int incomingDamage, Enum typeOfDamage)
+        public void GetDamage(int incomingDamage, Enum typeOfDamage)
         {
             int resultingDamage;
             if (typeOfDamage.Equals(TypeOfAttack.phisical))
@@ -393,7 +390,6 @@ class Program
 
             PrintResultDamage(HealthPoints, resultingDamage);
             HealthPoints -= resultingDamage;
-            return resultingDamage;
         }
     }
 
@@ -434,11 +430,11 @@ class Program
 
     class Weapon
     {
-        public string Name { get; private init; }
+        public string Name { get;}
         public int BaseDamage { get; init; }
         public int BonusDamage { get; init; }
         public int BonusSkillDamage { get; init; }
-        public BaseCharacter Owner { get; set; }
+        public BaseCharacter Owner { get; }
 
         private protected Weapon(string weaponName, BaseCharacter owner)
         {
@@ -460,7 +456,6 @@ class Program
             BonusDamage = Owner.Strenght;
         }
     }
-    
     class Dagger:Weapon
     {
         public Dagger(BaseCharacter owner):base("dagger", owner)
@@ -481,20 +476,15 @@ class Program
 
     class MagicSkill
     {
-        public string Name { get; private init; }
-        public int ManaCost { get; private set; }
+        public string Name { get;}
+        public int ManaCost { get;}
         public int MagicDamage { get; private protected set; }
-        public BaseCharacter Owner { get; set; }
         private protected MagicSkill(string skillName, int manaCost)
         {
             Name = skillName;
             ManaCost = manaCost;
         }
-
-        public int UseSkill()
-        {
-            return MagicDamage;
-        }
+        public int UseSkill() { return MagicDamage; }
     }
 
     class ChainLightning:MagicSkill
@@ -555,9 +545,9 @@ class Program
                 {
                     namesOfEnimies[i] = $"{enemyTM.Members[i].Type} {enemyTM.Members[i].Name}";
                 }
-
                 aboutHeroesAndEnimies += $"gang consists of well known bandits: {String.Join(", ", namesOfEnimies)}.";
             }
+            
             Console.WriteLine(aboutHeroesAndEnimies);
 
             if (namesOfHeroes.Length > 1)
