@@ -102,7 +102,7 @@ class Program
         int moveCounter = 1;
         while (alliesTM.AmountOfAlives != 0 && banditsTM.AmountOfAlives != 0)
         {
-            if (moveCounter % 2 != 0)
+            if ((moveCounter & 1) == 1)
             {
                 alliesTM.AttackTeam(banditsTM);
             }
@@ -110,7 +110,8 @@ class Program
             {
                 banditsTM.AttackTeam(alliesTM);
             }
-            moveCounter += 1;
+
+            moveCounter++;
         }
     }
     
@@ -184,10 +185,7 @@ class Program
                     member.Attack(aimForAttack);
                     
                     //for case with lightning damage
-                    if (enemyTeam.AmountOfAlives == 0)
-                    {
-                        break;
-                    }
+                    if (enemyTeam.AmountOfAlives == 0){ break; }
                 }
             }
         }
@@ -342,7 +340,6 @@ class Program
                 default:
                     throw new ArgumentException("Invalid class of character"); 
             }
-            
             return character;
         }
 
